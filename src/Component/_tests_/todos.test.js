@@ -9,7 +9,13 @@ test('should render todo component', () => {
   expect(todoElement).toHaveTextContent('New Task');
 });
 
-test.only('should New Task button works properly', async () => {
+test('Check todo list empty', () => {
+  render(<Todos />);
+  const todoListElement = screen.getByText('You have no tasks');
+  expect(todoListElement).toBeInTheDocument();
+});
+
+test('should New Task button works properly', async () => {
   render(<Todos />);
   const buttonElement = screen.getByTestId('newTaskBtn');
   await userEvent.click(buttonElement);
@@ -29,8 +35,16 @@ test.only('should New Task button works properly', async () => {
   fireEvent.change(screen.getByTestId('descinput'), {
     target: { value: taskdescinput },
   });
+  //After creating task check task is there
   fireEvent.click(screen.getByText(/Create Task/i));
   expect(screen.getAllByTestId('taskcard').length).toBe(1);
+  //Check todo list not empty
+  expect(screen.getAllByTestId('alltasklist').length).toBeGreaterThan(0);
+  //After deleting task check task is not there
+  const deletebtnelement = screen.getByTestId('deletebtn');
+  await fireEvent.click(deletebtnelement);
+  const todoListElement = screen.getByText('You have no tasks');
+  expect(todoListElement).toBeInTheDocument();
 });
 
 test('title should be there in component', () => {
