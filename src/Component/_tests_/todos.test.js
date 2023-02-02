@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Todos from '../todos';
+import { fetchTasks } from '../todoUtils';
 
 test('should render todo component', () => {
   render(<Todos />);
@@ -54,13 +55,25 @@ test('title should be there in component', () => {
 });
 test('background color action button should work properly', () => {
   render(<Todos />);
+  const themeColorValue = localStorage.getItem('mantine-color-scheme');
   const themechangeElement = screen.getByTestId('themechangebtn');
   userEvent.click(themechangeElement);
+  expect(localStorage.getItem('mantine-color-scheme')).toBe(
+    themeColorValue === '"dark"' ? '"light"' : '"dark"'
+  );
 });
-test('Create task button should work properly', () => {
-  render(<Todos />);
-  const createtaskbuttonElement = screen.getByRole('button', {
-    name: 'New Task',
+
+/* Checking how getByRole works , this testing already done at the top */
+// test('Create task button should work properly', () => {
+//   render(<Todos />);
+//   const createtaskbuttonElement = screen.getByRole('button', {
+//     name: 'New Task',
+//   });
+//   userEvent.click(createtaskbuttonElement);
+// });
+
+test('Promise data coming correctly', () => {
+  return fetchTasks.then((data) => {
+    expect(data).toBe('Code is Working');
   });
-  userEvent.click(createtaskbuttonElement);
 });

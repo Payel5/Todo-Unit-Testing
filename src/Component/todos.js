@@ -14,6 +14,7 @@ import {
 import { useColorScheme, useHotkeys, useLocalStorage } from '@mantine/hooks';
 import { useEffect, useRef, useState } from 'react';
 import { MoonStars, Sun, Trash } from 'tabler-icons-react';
+import { fetchTasks } from './todoUtils';
 
 export default function Todos() {
   const [tasks, setTasks] = useState([]);
@@ -62,17 +63,21 @@ export default function Todos() {
   }
 
   function loadTasks() {
-    let loadedTasks = localStorage.getItem('tasks');
+    // let loadedTasks = localStorage.getItem('tasks');
 
-    let tasks = JSON.parse(loadedTasks);
+    // let tasks = JSON.parse(loadedTasks);
 
-    if (tasks) {
+    // if (tasks) {
+    //   setTasks(tasks);
+    // }
+
+    fetchTasks.then(function (value) {
       setTasks(tasks);
-    }
+    });
   }
 
   function saveTasks(tasks) {
-    console.log('tasks', tasks);
+    //console.log('tasks', tasks);
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
@@ -80,7 +85,7 @@ export default function Todos() {
     loadTasks();
   }, []);
 
-  console.log('tasks', tasks);
+  //console.log('tasks', tasks);
 
   return (
     <div data-testid="todo-1">
@@ -89,6 +94,7 @@ export default function Todos() {
         toggleColorScheme={toggleColorScheme}
       >
         <MantineProvider
+          data-testid="themediv"
           theme={{ colorScheme, defaultRadius: 'md' }}
           withGlobalStyles
           withNormalizeCSS
@@ -162,42 +168,47 @@ export default function Todos() {
                   )}
                 </ActionIcon>
               </Group>
-              {tasks.length > 0 ? (
-                tasks.map((task, index) => {
-                  if (task.title) {
-                    return (
-                      <Card
-                        withBorder
-                        key={index}
-                        mt={'sm'}
-                        data-testid="taskcard"
-                      >
-                        <Group position={'apart'}>
-                          <Text weight={'bold'}>{task.title}</Text>
-                          <ActionIcon
-                            onClick={() => {
-                              deleteTask(index);
-                            }}
-                            color={'red'}
-                            variant={'transparent'}
+              <div data-testid="tasklist">
+                {tasks.length > 0 ? (
+                  <div data-testid="alltasklist">
+                    {tasks.map((task, index) => {
+                      if (task.title) {
+                        return (
+                          <Card
+                            withBorder
+                            key={index}
+                            mt={'sm'}
+                            data-testid="taskcard"
                           >
-                            <Trash />
-                          </ActionIcon>
-                        </Group>
-                        <Text color={'dimmed'} size={'md'} mt={'sm'}>
-                          {task.summary
-                            ? task.summary
-                            : 'No summary was provided for this task'}
-                        </Text>
-                      </Card>
-                    );
-                  }
-                })
-              ) : (
-                <Text size={'lg'} mt={'md'} color={'dimmed'}>
-                  You have no tasks
-                </Text>
-              )}
+                            <Group position={'apart'}>
+                              <Text weight={'bold'}>{task.title}</Text>
+                              <ActionIcon
+                                data-testid="deletebtn"
+                                onClick={() => {
+                                  deleteTask(index);
+                                }}
+                                color={'red'}
+                                variant={'transparent'}
+                              >
+                                <Trash />
+                              </ActionIcon>
+                            </Group>
+                            <Text color={'dimmed'} size={'md'} mt={'sm'}>
+                              {task.summary
+                                ? task.summary
+                                : 'No summary was provided for this task'}
+                            </Text>
+                          </Card>
+                        );
+                      }
+                    })}
+                  </div>
+                ) : (
+                  <Text size={'lg'} mt={'md'} color={'dimmed'}>
+                    You have no tasks
+                  </Text>
+                )}
+              </div>
               <Button
                 data-testid="newTaskBtn"
                 onClick={() => {
